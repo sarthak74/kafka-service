@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 
 @Service
 public class KafkaProducer {
@@ -32,18 +30,13 @@ public class KafkaProducer {
     }
 
     public void sendMessage(Employee employee){
-        String message = getMessage(employee);
-        log.info(String.format("[x] Sending Kafka request. Msg: " + message));
-        kafkaTemplate.send("secondTopic", message).addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
-            @Override
-            public void onSuccess(final SendResult<String, String> message) {
-                log.info("Message sent successfully\nMetadata: " + message.getRecordMetadata());
-            }
-            @Override
-            public void onFailure(final Throwable throwable) {
-                log.info("Message sending failed: " + message, throwable);
-            }
-        });
+        try {
+            String message = getMessage(employee);
+            log.info(String.format("[x] Sending Kafka request. Msg: " + message));
+            kafkaTemplate.send("secondTopic", message);
+        } catch (Exception e){
+            e.printStackTrace();
 
+        }
     }
 }
